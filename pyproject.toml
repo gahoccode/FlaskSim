@@ -8,16 +8,21 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.9"
 
-[project.dependencies]
-Flask = "3.0.3"
-pandas = "2.2.2"
-numpy = "1.26.4"
-matplotlib = "3.8.4"
-werkzeug = "3.0.2"
-pytest = "8.1.1"
+dependencies = [
+    "Flask==3.0.3",
+    "pandas==2.2.2",
+    "numpy==1.26.4",
+    "matplotlib==3.8.4",
+    "werkzeug==3.0.2",
+    "pytest==8.1.1"
+]
 
-[tool.uv]
-virtualenvs.in-project = true
+
+[tool.setuptools]
+py-modules = ["app"]
+
+[tool.setuptools.packages.find]
+exclude = ["static*", "templates*"]
 
 [build-system]
 requires = ["setuptools>=61.0"]
