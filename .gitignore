@@ -65,3 +65,6 @@ coverage.xml
 
 # Pyre
 .pyre/
+
+# Windsurf rules
+.windsurfrules

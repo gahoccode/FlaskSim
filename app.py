@@ -12,17 +12,51 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.exceptions import HTTPException
+from vnstock import Quote
+from datetime import datetime
 
 # Constants
-DATA_URL = "https://raw.githubusercontent.com/gahoccode/Datasets/main/myport2.csv"
 TRADING_DAYS_PER_YEAR = 252
 DEFAULT_NUM_PORT = 5000
 DEFAULT_RF_RATE = 0.0
+DEFAULT_SYMBOLS = 'REE,FMC,DHC'
+DEFAULT_START_DATE = '2024-01-01'
+DEFAULT_INTERVAL = '1D'
 
 app = Flask(__name__)
 app.secret_key = "portfolio_secret_key"
 
 # Utility Functions
+
+def load_vnstock_data(symbols, start_date, end_date, interval):
+    """Fetch and merge historical close prices for the given symbols and date range using vnstock API."""
+    all_historical_data = {}
+    for symbol in symbols:
+        try:
+            quote = Quote(symbol=symbol)
+            historical_data = quote.history(
+                start=start_date,
+                end=end_date,
+                interval=interval,
+                to_df=True
+            )
+            if not historical_data.empty:
+                all_historical_data[symbol] = historical_data[['time', 'close']].copy()
+                all_historical_data[symbol].rename(columns={'close': f'{symbol}_close'}, inplace=True)
+        except Exception as e:
+            print(f"Error fetching data for {symbol}: {e}")
+            continue
+    # Merge all close prices on 'time'
+    combined = None
+    for symbol, df in all_historical_data.items():
+        if combined is None:
+            combined = df
+        else:
+            combined = pd.merge(combined, df, on='time', how='outer')
+    if combined is not None:
+        combined = combined.sort_values('time').set_index('time')
+        combined = combined.ffill().bfill()  # Fill missing values
+    return combined
 
 def load_data(url: str) -> pd.DataFrame:
     """Load and preprocess dataset from GitHub CSV."""
@@ -126,20 +160,32 @@ def index():
         try:
             rf_rate = float(request.form.get('risk_free_rate', DEFAULT_RF_RATE))
             num_port = int(request.form.get('num_port', DEFAULT_NUM_PORT))
+            symbols = request.form.get('symbols', DEFAULT_SYMBOLS)
+            start_date = request.form.get('start_date', DEFAULT_START_DATE)
+            end_date = request.form.get('end_date', datetime.today().strftime('%Y-%m-%d'))
+            interval = request.form.get('interval', DEFAULT_INTERVAL)
             if num_port < 1000 or num_port > 20000:
                 flash('Number of simulations must be between 1000 and 20000.', 'danger')
                 return redirect(url_for('index'))
-            return redirect(url_for('optimize', rf_rate=rf_rate, num_port=num_port))
+            return redirect(url_for('optimize', rf_rate=rf_rate, num_port=num_port, symbols=symbols, start_date=start_date, end_date=end_date, interval=interval))
         except Exception as e:
             flash(f'Invalid input: {e}', 'danger')
-    return render_template('index.html', default_rf=DEFAULT_RF_RATE, default_num_port=DEFAULT_NUM_PORT)
+    return render_template('index.html', default_rf=DEFAULT_RF_RATE, default_num_port=DEFAULT_NUM_PORT, default_symbols=DEFAULT_SYMBOLS, default_start=DEFAULT_START_DATE, default_end=datetime.today().strftime('%Y-%m-%d'), default_interval=DEFAULT_INTERVAL)
 
 @app.route('/optimize')
 def optimize():
     try:
         rf_rate = float(request.args.get('rf_rate', DEFAULT_RF_RATE))
         num_port = int(request.args.get('num_port', DEFAULT_NUM_PORT))
-        df = load_data(DATA_URL)
+        symbols = request.args.get('symbols', DEFAULT_SYMBOLS)
+        start_date = request.args.get('start_date', DEFAULT_START_DATE)
+        end_date = request.args.get('end_date', datetime.today().strftime('%Y-%m-%d'))
+        interval = request.args.get('interval', DEFAULT_INTERVAL)
+        symbol_list = [s.strip().upper() for s in symbols.split(',') if s.strip()]
+        df = load_vnstock_data(symbol_list, start_date, end_date, interval)
+        if df is None or df.empty:
+            flash('No data found for the selected symbols and date range.', 'danger')
+            return redirect(url_for('index'))
         results = run_monte_carlo(df, num_port, rf_rate)
         optimal = get_optimal_portfolios(results)
         ef_img = plot_efficient_frontier(results, optimal)
