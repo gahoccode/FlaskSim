@@ -4,3 +4,4 @@ numpy==1.26.4
 matplotlib==3.8.4
 werkzeug==3.0.2
 pytest==8.1.1
+gunicorn
