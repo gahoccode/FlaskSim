@@ -1,0 +1,24 @@
+[project]
+name = "flasksim"
+version = "0.1.0"
+description = "Flask web app for portfolio optimization using Monte Carlo simulation"
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+
+[project.dependencies]
+Flask = "3.0.3"
+pandas = "2.2.2"
+numpy = "1.26.4"
+matplotlib = "3.8.4"
+werkzeug = "3.0.2"
+pytest = "8.1.1"
+
+[tool.uv]
+virtualenvs.in-project = true
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

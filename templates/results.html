@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimization Results</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="mb-4">Optimization Results</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <div class="row mb-4">
+            <div class="col-lg-8 mb-3">
+                <div class="card p-3">
+                    <h5>Efficient Frontier</h5>
+                    <img src="data:image/png;base64,{{ ef_img }}" class="img-fluid" alt="Efficient Frontier">
+                </div>
+            </div>
+            <div class="col-lg-4 mb-3">
+                <div class="card p-3 mb-3">
+                    <h6>Max Sharpe Ratio Portfolio</h6>
+                    <ul class="list-group mb-2">
+                        <li class="list-group-item">Return: {{ '%.2f'|format(max_sr.ret*100) }}%</li>
+                        <li class="list-group-item">Risk: {{ '%.2f'|format(max_sr.risk*100) }}%</li>
+                        <li class="list-group-item">Sharpe Ratio: {{ '%.2f'|format(max_sr.sr) }}</li>
+                    </ul>
+                    <img src="data:image/png;base64,{{ max_sr_pie }}" class="img-fluid" alt="Max Sharpe Weights">
+                </div>
+                <div class="card p-3">
+                    <h6>Min Variance Portfolio</h6>
+                    <ul class="list-group mb-2">
+                        <li class="list-group-item">Return: {{ '%.2f'|format(min_var.ret*100) }}%</li>
+                        <li class="list-group-item">Risk: {{ '%.2f'|format(min_var.risk*100) }}%</li>
+                        <li class="list-group-item">Sharpe Ratio: {{ '%.2f'|format(min_var.sr) }}</li>
+                    </ul>
+                    <img src="data:image/png;base64,{{ min_var_pie }}" class="img-fluid" alt="Min Var Weights">
+                </div>
+            </div>
+        </div>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Main Page</a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

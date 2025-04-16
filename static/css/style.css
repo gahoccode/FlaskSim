@@ -1,0 +1,12 @@
+body { background: #f7f9fa; }
+h1, h5, h6 { color: #1a365d; }
+.card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.btn-primary { background: #1a365d; border: none; }
+.btn-primary:hover { background: #274690; }
+.form-label { font-weight: 500; }
+.list-group-item { background: #f0f4f8; border: none; }
+.alert { font-size: 1rem; }
+@media (max-width: 768px) {
+  .container { padding: 0 0.5rem !important; }
+  .card { margin-bottom: 1rem; }
+}
