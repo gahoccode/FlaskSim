@@ -26,12 +26,14 @@ venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
+It is recommended to use [uv](https://github.com/astral-sh/uv) for fast and reliable dependency management:
+```sh
+uv sync
+```
+
+Alternatively, you can use pip:
 ```sh
 pip install -r requirements.txt
-```
-Or with uv:
-```sh
-uv pip install -r requirements.txt
 ```
 
 ### 4. Run the Application
