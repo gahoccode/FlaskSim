@@ -16,6 +16,7 @@ matplotlib = "3.8.4"
 werkzeug = "3.0.2"
 vnstock = "*"
 pytest = "8.1.1"
+gunicorn = "*"
 
 [tool.uv]
 virtualenvs.in-project = true
