@@ -8,15 +8,17 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.9"
 
-[project.dependencies]
-Flask = "3.0.3"
-pandas = "2.2.2"
-numpy = "1.26.4"
-matplotlib = "3.8.4"
-werkzeug = "3.0.2"
-vnstock = "*"
-pytest = "8.1.1"
-gunicorn = "*"
+[project]
+dependencies = [
+    "Flask==3.0.3",
+    "pandas==2.2.2",
+    "numpy==1.26.4",
+    "matplotlib==3.8.4",
+    "werkzeug==3.0.2",
+    "vnstock",
+    "pytest==8.1.1",
+    "gunicorn"
+]
 
 [tool.uv]
 virtualenvs.in-project = true
